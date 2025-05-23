@@ -5,6 +5,7 @@ import { FiCalendar, FiClock, FiCheck, FiArrowLeft } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import { Car } from '../types/car';
 import { getAllCars } from '../services/carService';
+import { submitTestDriveRequest } from '../services/adminService';
 
 // Properly typed AnimatePresence
 const AnimatePresence = FramerAnimatePresence as React.FC<{
@@ -394,20 +395,24 @@ const TestDrivePage: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Here you would typically make an API call to submit the test drive request
-    console.log({
+    if (!selectedCar || !selectedCarDetails) return;
+
+    // Отправляем данные через сервис
+    submitTestDriveRequest({
+      carId: selectedCar,
       name,
       phone,
       email,
-      carId: selectedCar,
-      carDetails: selectedCarDetails,
-      date,
-      time,
+      preferredDate: new Date(date),
+      preferredTime: time,
       message
+    }).then(() => {
+      // Показываем успешное подтверждение
+      setSubmitted(true);
+    }).catch(error => {
+      console.error('Ошибка при отправке заявки на тест-драйв:', error);
+      // В реальном приложении здесь был бы код для отображения ошибки пользователю
     });
-    
-    // For demo, just show success
-    setSubmitted(true);
   };
 
   if (submitted) {

@@ -21,9 +21,7 @@ export interface Car {
   description: string;
   isNew: boolean;
   inStock: boolean;
-  specifications: {
-    [key: string]: string | number;
-  };
+  specifications: Record<string, any>;
 }
 
 export interface CarFilters {
@@ -54,6 +52,25 @@ export interface TestDriveRequest {
   message?: string;
   status: 'pending' | 'approved' | 'completed' | 'canceled';
   createdAt: Date;
+}
+
+export interface ContactRequest {
+  id: number;
+  name: string;
+  email: string;
+  phone?: string;
+  subject?: string;
+  message: string;
+  status: 'new' | 'read' | 'replied' | 'archived';
+  createdAt: Date;
+}
+
+export interface AdminUser {
+  id: number;
+  username: string;
+  password: string;
+  fullName: string;
+  role: 'admin' | 'manager';
 }
 
 export interface Brand {

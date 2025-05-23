@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { motion, AnimatePresence as FramerAnimatePresence } from 'framer-motion';
 import { FiPhone, FiMail, FiMapPin, FiClock, FiSend, FiCheck, FiArrowLeft } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
+import { submitContactRequest } from '../services/adminService';
 
 // Type the icon components
 const IconPhone = FiPhone as React.FC;
@@ -389,21 +390,40 @@ const ContactPage: React.FC = () => {
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState('');
+  const [isSuccess, setIsSuccess] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Here you would typically make an API call to submit the contact form
-    console.log({
-      name,
-      email,
-      phone,
-      subject,
-      message
-    });
+    setIsSubmitting(true);
+    setFormError('');
     
-    // For demo, just show success
-    setSubmitted(true);
+    try {
+      // Отправляем данные через сервис
+      await submitContactRequest({
+        name,
+        email,
+        phone,
+        subject,
+        message
+      });
+      
+      // Очищаем форму и показываем сообщение об успехе
+      setName('');
+      setEmail('');
+      setPhone('');
+      setSubject('');
+      setMessage('');
+      setSubmitted(true);
+      setIsSuccess(true);
+    } catch (error) {
+      console.error('Error submitting contact form:', error);
+      setFormError('Произошла ошибка при отправке формы. Пожалуйста, попробуйте еще раз.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (submitted) {

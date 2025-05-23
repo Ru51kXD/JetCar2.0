@@ -233,6 +233,11 @@ const Footer: React.FC = () => {
                 Контакты
               </FooterLink>
             </FooterLinkItem>
+            <FooterLinkItem>
+              <FooterLink to="/admin/login" style={{ fontSize: '0.85rem', opacity: 0.7 }}>
+                Панель администратора
+              </FooterLink>
+            </FooterLinkItem>
           </FooterLinks>
         </FooterSection>
         

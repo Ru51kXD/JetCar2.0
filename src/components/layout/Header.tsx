@@ -248,6 +248,38 @@ const Header: React.FC = () => {
     document.body.style.overflow = 'auto';
   };
 
+  const renderNav = () => (
+    <>
+      <NavList>
+        <NavItem>
+          <NavLinkStyled to="/" onClick={closeMenu}>
+            Главная
+          </NavLinkStyled>
+        </NavItem>
+        <NavItem>
+          <NavLinkStyled to="/catalog" onClick={closeMenu}>
+            Каталог
+          </NavLinkStyled>
+        </NavItem>
+        <NavItem>
+          <NavLinkStyled to="/test-drive" onClick={closeMenu}>
+            Тест-драйв
+          </NavLinkStyled>
+        </NavItem>
+        <NavItem>
+          <NavLinkStyled to="/about" onClick={closeMenu}>
+            О компании
+          </NavLinkStyled>
+        </NavItem>
+        <NavItem>
+          <NavLinkStyled to="/contact" onClick={closeMenu}>
+            Контакты
+          </NavLinkStyled>
+        </NavItem>
+      </NavList>
+    </>
+  );
+
   return (
     <HeaderContainer isScrolled={isScrolled}>
       <HeaderInner>
@@ -256,23 +288,7 @@ const Header: React.FC = () => {
         </Logo>
         
         <Nav>
-          <NavList>
-            <NavItem>
-              <NavLinkStyled to="/">Главная</NavLinkStyled>
-            </NavItem>
-            <NavItem>
-              <NavLinkStyled to="/catalog">Каталог</NavLinkStyled>
-            </NavItem>
-            <NavItem>
-              <NavLinkStyled to="/test-drive">Тест-драйв</NavLinkStyled>
-            </NavItem>
-            <NavItem>
-              <NavLinkStyled to="/about">О нас</NavLinkStyled>
-            </NavItem>
-            <NavItem>
-              <NavLinkStyled to="/contact">Контакты</NavLinkStyled>
-            </NavItem>
-          </NavList>
+          {renderNav()}
           
           <ContactButton href="tel:+79361526567">
             <IconPhone />
@@ -319,7 +335,7 @@ const Header: React.FC = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
                 >
-                  <MobileNavLink to="/about" onClick={closeMenu}>О нас</MobileNavLink>
+                  <MobileNavLink to="/about" onClick={closeMenu}>О компании</MobileNavLink>
                 </MobileNavItem>
                 <MobileNavItem
                   initial={{ opacity: 0, y: 20 }}
@@ -334,7 +350,7 @@ const Header: React.FC = () => {
                 href="tel:+79361526567"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
+                transition={{ delay: 0.7 }}
               >
                 <IconPhone />
                 +7 (936) 152-65-67
