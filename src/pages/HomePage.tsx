@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useLayoutEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { motion, useAnimation } from 'framer-motion';
@@ -471,15 +471,20 @@ const HomePage: React.FC = () => {
   const [parallaxRef, parallaxInView] = useInView({ threshold: 0.3, triggerOnce: true });
   const [ctaRef, ctaInView] = useInView({ threshold: 0.3, triggerOnce: true });
   
-  useEffect(() => {
-    const sequence = async () => {
-      await titleControls.start({ opacity: 1, y: 0, transition: { duration: 0.8 } });
-      await subtitleControls.start({ opacity: 1, y: 0, transition: { duration: 0.8 } });
-      await buttonControls.start({ opacity: 1, y: 0, transition: { duration: 0.8 } });
-    };
-    
+  // Используем useCallback, чтобы sequence не пересоздавался при каждом рендере
+  const sequence = useCallback(async () => {
+    await titleControls.start({ opacity: 1, y: 0, transition: { duration: 0.8 } });
+    await subtitleControls.start({ opacity: 1, y: 0, transition: { duration: 0.8 } });
+    await buttonControls.start({ opacity: 1, y: 0, transition: { duration: 0.8 } });
+  }, [titleControls, subtitleControls, buttonControls]);
+  
+  // Используем useLayoutEffect для анимаций, которые должны быть запущены до отрисовки
+  useLayoutEffect(() => {
     sequence();
-    
+  }, [sequence]);
+  
+  // Оставляем useEffect для анимаций, зависящих от inView
+  useEffect(() => {    
     if (aboutInView) {
       // Animations for about section
     }
@@ -491,7 +496,7 @@ const HomePage: React.FC = () => {
     if (ctaInView) {
       // Animations for CTA section
     }
-  }, [titleControls, subtitleControls, buttonControls, aboutInView, parallaxInView, ctaInView]);
+  }, [aboutInView, parallaxInView, ctaInView]);
 
   return (
     <>
@@ -832,7 +837,7 @@ const HomePage: React.FC = () => {
             animate={ctaInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            Наши консультанты помогут вам подобрать идеальный автомобиль, соответствующий вашим требованиям и бюджету. Свяжитесь с нами или посетите наш автосалон в Москве.
+            Наши консультанты помогут вам подобрать идеальный автомобиль, соответствующий вашим требованиям и бюджету. Свяжитесь с нами или посетите наш автосалон в Астане.
           </CtaText>
           <motion.div
             initial={{ opacity: 0, y: 30 }}

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { motion } from 'framer-motion';
-import { FiPhone, FiMail, FiMapPin, FiClock, FiSend } from 'react-icons/fi';
+import { motion, AnimatePresence as FramerAnimatePresence } from 'framer-motion';
+import { FiPhone, FiMail, FiMapPin, FiClock, FiSend, FiCheck, FiArrowLeft } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
 
 // Type the icon components
 const IconPhone = FiPhone as React.FC;
@@ -9,6 +10,13 @@ const IconMail = FiMail as React.FC;
 const IconMapPin = FiMapPin as React.FC;
 const IconClock = FiClock as React.FC;
 const IconSend = FiSend as React.FC;
+const IconCheck = FiCheck as React.FC;
+const IconArrowLeft = FiArrowLeft as React.FC;
+
+// Properly typed AnimatePresence
+const AnimatePresence = FramerAnimatePresence as React.FC<{
+  children: React.ReactNode;
+}>;
 
 const PageContainer = styled.div`
   max-width: 1400px;
@@ -275,12 +283,103 @@ const SubmitButton = styled.button`
   }
 `;
 
-const SuccessMessage = styled.div`
-  padding: 20px;
-  background-color: #f0f9f0;
-  border-left: 4px solid #4caf50;
+// Стили для анимированной карточки успешной отправки сообщения
+const SuccessCard = styled(motion.div)`
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+  padding: 50px 40px;
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto;
+`;
+
+const SuccessIcon = styled.div`
+  width: 100px;
+  height: 100px;
+  background-color: #eaf9f0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 30px;
+  
+  svg {
+    color: #2ecc71;
+    width: 50px;
+    height: 50px;
+    stroke-width: 2;
+  }
+`;
+
+const SuccessTitle = styled.h2`
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #2c3e50;
+`;
+
+const SuccessText = styled.p`
+  font-size: 1.1rem;
   margin-bottom: 30px;
+  color: #555;
+  line-height: 1.6;
+`;
+
+const ButtonsContainer = styled.div`
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  
+  @media (max-width: 576px) {
+    flex-direction: column;
+  }
+`;
+
+const PrimaryButton = styled(Link)`
+  background-color: #d9a34a;
+  color: white;
+  border: none;
   border-radius: 4px;
+  padding: 15px 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+  
+  &:hover {
+    background-color: #c08b35;
+    transform: translateY(-3px);
+  }
+`;
+
+const SecondaryButton = styled(Link)`
+  background-color: transparent;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 15px 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  
+  svg {
+    margin-right: 8px;
+  }
+  
+  &:hover {
+    border-color: #333;
+    transform: translateY(-3px);
+  }
 `;
 
 const ContactPage: React.FC = () => {
@@ -306,6 +405,65 @@ const ContactPage: React.FC = () => {
     // For demo, just show success
     setSubmitted(true);
   };
+
+  if (submitted) {
+    return (
+      <PageContainer>
+        <AnimatePresence>
+          <SuccessCard
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ 
+              duration: 0.5,
+              type: "spring",
+              stiffness: 100
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ 
+                delay: 0.3, 
+                type: "spring",
+                stiffness: 200
+              }}
+            >
+              <SuccessIcon>
+                <IconCheck />
+              </SuccessIcon>
+            </motion.div>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.5 }}
+            >
+              <SuccessTitle>Сообщение отправлено!</SuccessTitle>
+              <SuccessText>
+                Благодарим за обращение! Мы получили ваше сообщение и ответим в ближайшее время. 
+                Наши специалисты свяжутся с вами по указанным контактным данным.
+              </SuccessText>
+            </motion.div>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7, duration: 0.5 }}
+            >
+              <ButtonsContainer>
+                <SecondaryButton to="/">
+                  <IconArrowLeft /> Вернуться на главную
+                </SecondaryButton>
+                <PrimaryButton to="/catalog">
+                  Посмотреть каталог
+                </PrimaryButton>
+              </ButtonsContainer>
+            </motion.div>
+          </SuccessCard>
+        </AnimatePresence>
+      </PageContainer>
+    );
+  }
 
   return (
     <PageContainer>
@@ -398,12 +556,6 @@ const ContactPage: React.FC = () => {
         >
           <FormContainer>
             <FormTitle>Отправить сообщение</FormTitle>
-            
-            {submitted && (
-              <SuccessMessage>
-                Ваше сообщение успешно отправлено! Мы свяжемся с вами в ближайшее время.
-              </SuccessMessage>
-            )}
             
             <form onSubmit={handleSubmit}>
               <Row>

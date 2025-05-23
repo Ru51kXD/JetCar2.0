@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { motion, AnimatePresence as FramerAnimatePresence } from 'framer-motion';
+import { motion, useAnimation, AnimatePresence as FramerAnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { FiFilter, FiX, FiSearch, FiChevronDown, FiChevronUp, FiSliders, FiClock, FiCalendar, FiTruck } from 'react-icons/fi';
 
@@ -494,6 +494,16 @@ const CatalogPage: React.FC = () => {
     triggerOnce: true
   });
   
+  // Создаем контроллеры анимаций
+  const containerControls = useAnimation();
+  
+  // Запускаем анимации после монтирования компонента
+  useLayoutEffect(() => {
+    if (inView) {
+      containerControls.start("visible");
+    }
+  }, [inView, containerControls]);
+  
   // Обработка фильтров
   useEffect(() => {
     const newFilters: CarFilters = {};
@@ -706,7 +716,7 @@ const CatalogPage: React.FC = () => {
           ref={ref}
           variants={containerVariants}
           initial="hidden"
-          animate={inView ? "visible" : "hidden"}
+          animate={containerControls}
         >
           <CarsGrid>
             {currentCars.map(car => (

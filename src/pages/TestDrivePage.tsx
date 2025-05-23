@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion, AnimatePresence as FramerAnimatePresence } from 'framer-motion';
-import { FiCalendar, FiClock } from 'react-icons/fi';
+import { FiCalendar, FiClock, FiCheck, FiArrowLeft } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
 import { Car } from '../types/car';
 import { getAllCars } from '../services/carService';
 
@@ -13,6 +14,8 @@ const AnimatePresence = FramerAnimatePresence as React.FC<{
 // Type the icon components
 const IconCalendar = FiCalendar as React.FC;
 const IconClock = FiClock as React.FC;
+const IconCheck = FiCheck as React.FC;
+const IconArrowLeft = FiArrowLeft as React.FC;
 
 const PageContainer = styled.div`
   max-width: 1400px;
@@ -206,33 +209,147 @@ const InfoItem = styled.li`
   }
 `;
 
-const CarSelect = styled.div`
-  margin-top: 10px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+// Новые стили для улучшенной анимации успешной записи
+const SuccessCard = styled(motion.div)`
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+  padding: 50px 40px;
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto;
+`;
+
+const SuccessIcon = styled.div`
+  width: 100px;
+  height: 100px;
+  background-color: #eaf9f0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 30px;
+  
+  svg {
+    color: #2ecc71;
+    width: 50px;
+    height: 50px;
+    stroke-width: 2;
+  }
+`;
+
+const SuccessTitle = styled.h2`
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #2c3e50;
+`;
+
+const SuccessText = styled.p`
+  font-size: 1.1rem;
+  margin-bottom: 30px;
+  color: #555;
+  line-height: 1.6;
+`;
+
+const ButtonsContainer = styled.div`
+  display: flex;
+  gap: 20px;
+  justify-content: center;
   
   @media (max-width: 576px) {
-    grid-template-columns: 1fr;
+    flex-direction: column;
   }
 `;
 
-const CarOption = styled.div<{ selected: boolean }>`
-  border: 1px solid ${props => props.selected ? '#d9a34a' : '#ddd'};
+const PrimaryButton = styled(Link)`
+  background-color: #d9a34a;
+  color: white;
+  border: none;
   border-radius: 4px;
-  padding: 10px;
+  padding: 15px 25px;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  background-color: ${props => props.selected ? 'rgba(217, 163, 74, 0.1)' : 'white'};
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
   
   &:hover {
-    border-color: #d9a34a;
+    background-color: #c08b35;
+    transform: translateY(-3px);
   }
 `;
 
-const CarOptionTitle = styled.div`
+const SecondaryButton = styled(Link)`
+  background-color: transparent;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 15px 25px;
+  font-size: 1rem;
   font-weight: 600;
-  margin-bottom: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  
+  svg {
+    margin-right: 8px;
+  }
+  
+  &:hover {
+    border-color: #333;
+    transform: translateY(-3px);
+  }
+`;
+
+const CarGroupDetails = styled.div`
+  margin-top: 15px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  padding: 15px;
+  border: 1px solid #eee;
+`;
+
+const CarDetails = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 4px;
+  background-color: white;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+`;
+
+const CarImage = styled.div`
+  width: 60px;
+  height: 40px;
+  margin-right: 15px;
+  background-position: center;
+  background-size: cover;
+  border-radius: 4px;
+`;
+
+const CarInfo = styled.div`
+  flex: 1;
+`;
+
+const CarName = styled.div`
+  font-weight: 600;
+  margin-bottom: 3px;
+`;
+
+const CarSpecs = styled.div`
+  font-size: 0.85rem;
+  color: #777;
 `;
 
 const TestDrivePage: React.FC = () => {
@@ -246,6 +363,7 @@ const TestDrivePage: React.FC = () => {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [submitted, setSubmitted] = useState(false);
+  const [selectedCarDetails, setSelectedCarDetails] = useState<Car | null>(null);
 
   useEffect(() => {
     const fetchCars = async () => {
@@ -263,6 +381,16 @@ const TestDrivePage: React.FC = () => {
     fetchCars();
   }, []);
 
+  useEffect(() => {
+    // Обновить детали выбранного автомобиля при изменении selectedCar
+    if (selectedCar) {
+      const carDetails = cars.find(car => car.id === selectedCar) || null;
+      setSelectedCarDetails(carDetails);
+    } else {
+      setSelectedCarDetails(null);
+    }
+  }, [selectedCar, cars]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -272,6 +400,7 @@ const TestDrivePage: React.FC = () => {
       phone,
       email,
       carId: selectedCar,
+      carDetails: selectedCarDetails,
       date,
       time,
       message
@@ -284,19 +413,80 @@ const TestDrivePage: React.FC = () => {
   if (submitted) {
     return (
       <PageContainer>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <PageHeader>
-            <PageTitle>Запись на тест-драйв отправлена!</PageTitle>
-            <PageDescription>
-              Спасибо за вашу заявку. Наш менеджер свяжется с вами в ближайшее время 
-              для подтверждения даты и времени тест-драйва.
-            </PageDescription>
-          </PageHeader>
-        </motion.div>
+        <AnimatePresence>
+          <SuccessCard
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ 
+              duration: 0.5,
+              type: "spring",
+              stiffness: 100
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ 
+                delay: 0.3, 
+                type: "spring",
+                stiffness: 200
+              }}
+            >
+              <SuccessIcon>
+                <IconCheck />
+              </SuccessIcon>
+            </motion.div>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.5 }}
+            >
+              <SuccessTitle>Запись успешно создана!</SuccessTitle>
+              <SuccessText>
+                Мы получили вашу заявку на тест-драйв и скоро свяжемся с вами для подтверждения.
+                {selectedCarDetails && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.8, duration: 0.5 }}
+                  >
+                    <CarGroupDetails>
+                      <strong>Выбранный автомобиль:</strong>
+                      <CarDetails>
+                        <CarImage 
+                          style={{ backgroundImage: `url(${selectedCarDetails.mainImage})` }} 
+                        />
+                        <CarInfo>
+                          <CarName>{selectedCarDetails.brand} {selectedCarDetails.model}</CarName>
+                          <CarSpecs>
+                            {selectedCarDetails.year}, {selectedCarDetails.engine.volume}л, 
+                            {selectedCarDetails.transmission}
+                          </CarSpecs>
+                        </CarInfo>
+                      </CarDetails>
+                    </CarGroupDetails>
+                  </motion.div>
+                )}
+              </SuccessText>
+            </motion.div>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7, duration: 0.5 }}
+            >
+              <ButtonsContainer>
+                <SecondaryButton to="/">
+                  <IconArrowLeft /> Вернуться на главную
+                </SecondaryButton>
+                <PrimaryButton to="/catalog">
+                  Посмотреть все автомобили
+                </PrimaryButton>
+              </ButtonsContainer>
+            </motion.div>
+          </SuccessCard>
+        </AnimatePresence>
       </PageContainer>
     );
   }
@@ -361,19 +551,44 @@ const TestDrivePage: React.FC = () => {
               </FormGroup>
 
               <FormGroup>
-                <Label>Выберите автомобиль</Label>
-                <CarSelect>
-                  {cars.slice(0, 4).map(car => (
-                    <CarOption 
-                      key={car.id}
-                      selected={selectedCar === car.id}
-                      onClick={() => setSelectedCar(car.id)}
-                    >
-                      <CarOptionTitle>{car.brand} {car.model}</CarOptionTitle>
-                      <div>{car.year}, {car.engine.volume}л, {car.transmission}</div>
-                    </CarOption>
+                <Label htmlFor="car">Выберите автомобиль</Label>
+                <Select 
+                  id="car" 
+                  required
+                  value={selectedCar || ''}
+                  onChange={(e) => setSelectedCar(Number(e.target.value))}
+                >
+                  <option value="">Выберите автомобиль</option>
+                  {cars.map(car => (
+                    <option key={car.id} value={car.id}>
+                      {car.brand} {car.model} ({car.year}) - {car.engine.volume}л, {car.transmission}
+                    </option>
                   ))}
-                </CarSelect>
+                </Select>
+                
+                {selectedCarDetails && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <CarGroupDetails>
+                      <CarDetails>
+                        <CarImage 
+                          style={{ backgroundImage: `url(${selectedCarDetails.mainImage})` }} 
+                        />
+                        <CarInfo>
+                          <CarName>{selectedCarDetails.brand} {selectedCarDetails.model}</CarName>
+                          <CarSpecs>
+                            {selectedCarDetails.year}, {selectedCarDetails.engine.volume}л, 
+                            {selectedCarDetails.engine.power} л.с., {selectedCarDetails.transmission}, 
+                            {selectedCarDetails.color}
+                          </CarSpecs>
+                        </CarInfo>
+                      </CarDetails>
+                    </CarGroupDetails>
+                  </motion.div>
+                )}
               </FormGroup>
 
               <Row>
